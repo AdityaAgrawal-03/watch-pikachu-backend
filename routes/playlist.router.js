@@ -6,7 +6,7 @@ playlistRouter.route("/")
     try {
       res.json({ success: true })
     } catch (error) {
-      res.status(404).json({ success: false })
+      res.status(404).json({ success: false,  })
     }
   })
 

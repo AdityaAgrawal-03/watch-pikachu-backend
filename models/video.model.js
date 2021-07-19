@@ -21,6 +21,11 @@ const VideoSchema = new Schema({
     type: String,
     required: "Cannot add video without statistics",
   },
+  description: {
+    type: String,
+    required: "Cannot add video without description",
+    
+  },
   channelName: {
     type: String,
     required: "Cannot add video without channelName",
