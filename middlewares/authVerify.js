@@ -9,7 +9,7 @@ const authVerify = (req, res, next) => {
     return next();
   } catch (error) {
     console.log(error);
-    res.status(401).json({ success: false, message: "Unauthorized access, please add the token" })
+    res.status(401).json({ success: false, message: "Unauthorized access, please add the token", errorMessage: error.message })
   }
 };
 

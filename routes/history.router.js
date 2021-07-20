@@ -9,7 +9,7 @@ historyRouter.route("/")
       const historyVideos = await HistoryVideo.findById(userId).populate("videos");
       res.json({ success: true, historyVideos });
     } catch (error) {
-      res.status(404).json({ success: false })
+      res.json({ success: false })
     }
   })
 
@@ -18,11 +18,26 @@ historyRouter.route("/")
       const { userId } = req.user;
       const { video } = req.body;
       const historyVideos = await HistoryVideo.findById(userId);
-      historyVideos.videos.push(video);
+      const isInHistory = historyVideos.videos.find(videoId => videoId.toString() === video._id )
+      isInHistory  
+      ? historyVideos.videos.pull(video)
+      : historyVideos.videos.push(video);
       await historyVideos.save();
       res.json({ success: true, historyVideos })
     } catch (error) {
-      res.status(401).json({ success: false })
+      res.json({ success: false,  errorMessage: error.message })
+    }
+  })
+
+  .delete(async (req, res) => {
+    try {
+      const { userId } = req.user;
+      const historyVideos = await HistoryVideo.findById(userId);
+      historyVideos.videos = [];
+      await historyVideos.save();
+      res.json({ success: true, historyVideos })
+    } catch (error) {
+      res.json({ success: false, errorMessage: error.message })
     }
   })
 

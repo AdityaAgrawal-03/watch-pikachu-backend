@@ -10,7 +10,7 @@ likedRouter.route("/")
       
       res.json({ success: true, likedVideos })
     } catch (error) {
-      res.status(404).json({ success: false })
+      res.json({ success: false })
     }
   })
 
@@ -18,12 +18,17 @@ likedRouter.route("/")
     try {
       const { userId } = req.user;
       const { video } = req.body;
-      console.log(video)
+      
       const likedVideos = await LikedVideo.findById(userId);
-      likedVideos.videos.push(video);
+      const isInLiked = likedVideos.videos.find(videoId => videoId.toString() === video._id )
+
+      console.log({ isInLiked })
+
+      isInLiked ? likedVideos.videos.pull(video) : likedVideos.videos.push(video);
+      
       await likedVideos.save();
 
-      res.json({ success: true, likedVideos, message: "video successfully added to liked videos" })
+      res.json({ success: true, likedVideos, message: "liked videos updated" })
     } catch (error) {
       res.json({ success: false })
     }

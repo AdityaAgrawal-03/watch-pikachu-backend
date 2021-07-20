@@ -1,7 +1,9 @@
 const express = require("express");
 const signupRouter = express.Router();
+const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { v4: uuidv4 } = require('uuid');
 const secret = process.env['secret'];
 const { User } = require("../models/user.model");
 const { LikedVideo } = require("../models/liked.model");
@@ -33,7 +35,12 @@ signupRouter.route("/")
       });
       
       const NewPlaylist = new Playlist({
-        _id: user._id
+        _id: user._id,
+        playlists:[{
+          _id: uuidv4(),
+          name: "Watch Later",
+          videos: []  
+        }]
       });
 
       await NewLikedVideo.save();
