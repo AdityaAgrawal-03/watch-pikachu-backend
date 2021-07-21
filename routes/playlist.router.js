@@ -38,25 +38,62 @@ playlistRouter.route("/")
     }
   })
 
-// add video to playlist
-playlistRouter.route("/:playlistId")
+// add or remove video to playlist
+playlistRouter.route("/:playlistId/:videoId")
   .post(async (req, res) => {
     try {
       const { userId } = req.user;
-      const { playlistId } = req.params;
-      const {  videoId } = req.body;
-      console.log({ videoId });
-      console.log({ playlistId });
+      const { playlistId, videoId } = req.params;
       const userPlaylist = await Playlist.findById(userId);
       const playlistToBeUpdated = userPlaylist.playlists.find(playlist => playlist._id === playlistId);
       console.log({ playlistToBeUpdated })
 
       const isInPlaylist = playlistToBeUpdated.videos.find(playlistVideosId => playlistVideosId.toString() === videoId);
 
-      isInPlaylist 
-      ? playlistToBeUpdated.videos.pull(videoId) : playlistToBeUpdated.videos.push(videoId);
+      isInPlaylist
+        ? playlistToBeUpdated.videos.pull(videoId) : playlistToBeUpdated.videos.push(videoId);
       await userPlaylist.save();
       res.json({ success: true, playlist: playlistToBeUpdated })
+    } catch (error) {
+      res.json({ success: false, errorMessage: error.message })
+    }
+  });
+
+
+// update playlist 
+playlistRouter.route("/:playlistId")
+  .post(async (req, res) => {
+    try {
+      const { userId } = req.user;
+      const { playlistId } = req.params;
+      const { playlistUpdatedName } = req.body;
+      const userPlaylist = await Playlist.findById(userId);
+      const playlistToBeUpdated = userPlaylist.playlists.find(playlist => playlist._id === playlistId);
+
+      console.log({ playlistToBeUpdated });
+
+      playlistToBeUpdated.name = playlistUpdatedName;
+
+      await userPlaylist.save();
+
+      res.json({ success: true, updatedPlaylist: playlistToBeUpdated })
+    } catch (error) {
+      res.json({ success: false, errorMessage: error.message })
+    }
+  })
+
+  // delete playlist
+  .delete(async (req, res) => {
+    try {
+      const { userId } = req.user;
+      const { playlistId } = req.params;
+      const userPlaylist = await Playlist.findById(userId);
+      const playlistToBeDeleted = userPlaylist.playlists.find(playlist => playlist._id === playlistId);
+
+      userPlaylist.playlists.pull(playlistToBeDeleted);
+      await userPlaylist.save();
+       
+      res.json({ success: true, userPlaylist, deletedPlaylist: playlistToBeDeleted })
     } catch (error) {
       res.json({ success: false, errorMessage: error.message })
     }
